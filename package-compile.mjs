@@ -37,10 +37,9 @@ const loadPrompt = async ({ name, marker, temperature }) => ({
   "api-key-env-var": "OPENAI_API_KEY",
   "model": "gpt-4o-mini",
   temperature,
-  "system-message": await readFile(
-    new URL(`prompts/${name}.md`, import.meta.url),
-    "utf8",
-  ),
+  "system-message": (
+    await readFile(new URL(`prompts/${name}.md`, import.meta.url), "utf8")
+  ).split("\n"),
   "begin-selection-marker": `START-${marker}`,
   "end-selection-marker": `STOP-${marker}`,
   "section-hierarchy": [
@@ -73,7 +72,7 @@ const prompts = await Promise.all(
 await writeFile(
   new URL("package.json", import.meta.url),
   formatJson(
-    (await readFile(new URL("package.json", import.meta.url), "utf8"))
+    (await readFile(new URL("package-template.json", import.meta.url), "utf8"))
       .replace('"<DEFAULT-PROMPT-LIST>"', () => JSON.stringify(prompts))
       .replace("<LIB-DIR>", LIB_DIR[env]),
   ),

@@ -12,10 +12,15 @@
   "activationEvents": ["onStartupFinished"],
   "main": "./<LIB-DIR>/index.js",
   "contributes": {
-    "commands": [],
+    "commands": [
+      {
+        "command": "latex-assistant.prompt",
+        "title": "Prompt LaTeX Assistant"
+      }
+    ],
     "configuration": {
       "type": "object",
-      "title": "Listing Extension Settings",
+      "title": "LaTeX Assistant Extension Settings",
       "properties": {
         "latex-assistant.openai": {
           "description": "List of prompts powered by OpenAI.",
@@ -39,8 +44,9 @@
                 "type": "number"
               },
               "system-message": {
-                "description": "The system message that defines the behavior of the prompt.",
-                "type": "string"
+                "description": "The lines of the system message that defines the behavior of the prompt.",
+                "type": "array",
+                "items": { "type": "string" }
               },
               "begin-seletion-marker": {
                 "description": "The marker that defines the beginning of the selection.",
@@ -76,8 +82,8 @@
     "check-type": "npx tsc",
     "check-format": "npx prettier --check .",
     "check": "npm run check-type && npm run check-format",
-    "pack": "node bundle.mjs && node flip.mjs prod && npx vsce package && node flip.mjs test",
-    "publish": "node bundle.mjs && node flip.mjs prod && npx vsce publish && node flip.mjs test"
+    "pack": "node package-compile.mjs prod && node bundle.mjs && npx vsce package",
+    "publish": "node package-compile.mjs prod && node bundle.mjs && npx vsce publish"
   },
   "files": ["out/index.js", "package.json", "seagull.png", "LICENSE"],
   "devDependencies": {

@@ -1,7 +1,14 @@
 import vscode from "../ext/vscode.mjs";
-import { env } from "node:process";
+import { fetchOpenai } from "./openai.mjs";
+import { compileGet, getErrorMessage } from "./util.mjs";
 import { excerpt } from "./excerpt.mjs";
-import { executeOpenai } from "./openai.mjs";
+
+const LINE_SEPARATOR = {
+  [vscode.EndOfLine.LF]: "\n",
+  [vscode.EndOfLine.CRLF]: "\r\n",
+};
+
+const getName = compileGet("name");
 
 /**
  * @type {(
@@ -9,28 +16,57 @@ import { executeOpenai } from "./openai.mjs";
  * ) => void}
  */
 export const activate = (context) => {
-  /** @type {import("./config").Config} */
-  const config = /** @type {any} */ (
-    vscode.workspace.getConfiguration("latex-assistant")
+  context.subscriptions.push(
+    vscode.commands.registerTextEditorCommand(
+      "latex-assistant.prompt",
+      async (editor, _edit, input) => {
+        /** @type {import("./config").Config} */
+        const config = /** @type {any} */ (
+          vscode.workspace.getConfiguration("latex-assistant")
+        );
+        try {
+          await execute(editor, input, config);
+        } catch (error) {
+          vscode.window.showErrorMessage(getErrorMessage(error));
+        }
+      },
+    ),
   );
-  for (const prompt of config.openai) {
-    context.subscriptions.push(
-      vscode.commands.registerCommand(
-        `latex-assistant-${prompt.name}`,
-        async () => {
-          const { window } = vscode;
-          try {
-            await executeOpenai(window, prompt);
-          } catch (error) {
-            if (error instanceof Error) {
-              window.showErrorMessage(error.message);
-            } else {
-              window.showErrorMessage("An unknown error occurred");
-            }
-          }
-        },
-      ),
-    );
+};
+
+const DELIMITER = "%%%%%%%%%%";
+
+/**
+ * @type {(
+ *   editor: import("vscode").TextEditor,
+ *   input: unknown,
+ *   config: import("./config").Config,
+ * ) => Promise<void>}
+ */
+const execute = async (editor, input, config) => {
+  const name =
+    input ??
+    (await vscode.window.showQuickPick(config.openai.map(getName), {
+      placeHolder: "Choose a prompt",
+    }));
+  if (name != null) {
+    const prompt = config.openai.find((prompt) => prompt.name === name);
+    if (prompt == null) {
+      throw new Error(`Unknown prompt: ${name}`);
+    }
+    const { selection } = editor;
+    const line_separator = LINE_SEPARATOR[editor.document.eol];
+    const message = excerpt(editor.document.getText(), selection, {
+      line_separator,
+      config: prompt,
+    });
+    const result = await fetchOpenai(message, prompt);
+    editor.edit((edit) => {
+      edit.insert(
+        new vscode.Position(selection.end.line + 1, 0),
+        [DELIMITER, result, DELIMITER, ""].join(line_separator),
+      );
+    });
   }
 };
 

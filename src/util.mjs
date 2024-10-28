@@ -20,3 +20,25 @@ export const toNullableStringEntry = (key) => [key, null];
  */
 export const get = (obj, key) =>
   Object.hasOwn(obj, key) ? (obj[key] ?? null) : null;
+
+/**
+ * @type {<K extends string>(
+ *   key: K,
+ * ) => <V>(
+ *   obj: { [key in K]: V },
+ * ) => V}
+ */
+export const compileGet = (key) => (obj) => obj[key];
+
+/**
+ * @type {(
+ *   error: unknown,
+ * ) => string}
+ */
+export const getErrorMessage = (error) => {
+  if (error instanceof Error) {
+    return error.message;
+  } else {
+    return "An unknown error occurred";
+  }
+};

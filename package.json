@@ -12,12 +12,17 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./src/index.js",
+  "main": "./out/index.js",
   "contributes": {
-    "commands": [],
+    "commands": [
+      {
+        "command": "latex-assistant.prompt",
+        "title": "Prompt LaTeX Assistant"
+      }
+    ],
     "configuration": {
       "type": "object",
-      "title": "Listing Extension Settings",
+      "title": "LaTeX Assistant Extension Settings",
       "properties": {
         "latex-assistant.openai": {
           "description": "List of prompts powered by OpenAI.",
@@ -41,8 +46,11 @@
                 "type": "number"
               },
               "system-message": {
-                "description": "The system message that defines the behavior of the prompt.",
-                "type": "string"
+                "description": "The lines of the system message that defines the behavior of the prompt.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "begin-seletion-marker": {
                 "description": "The marker that defines the beginning of the selection.",
@@ -75,7 +83,42 @@
               "api-key-env-var": "OPENAI_API_KEY",
               "model": "gpt-4o-mini",
               "temperature": 0.4,
-              "system-message": "You are an assistant skilled in revising academic writing in LaTeX format. You will be provided an excerpt of a LaTeX document containing a selection surrounded by START-REVISING and STOP-REVISING. For example:\n\n```latex\n\\title{Title of the Document} % optional summary of the document\n\\chapter{Parent Chapter} % optional summary of the containing chapter\n\\section{Parent Section} % optional summary of the containing section\n...\nText directly before\nSTART-REVISING\nText to revise\nSTOP-REVISING\nText directly after\n...\n```\n\nYou are to revise the text surrounded by START-REVISING and STOP-REVISING without producing any additional content. Your revision should:\n\n1. retain the original meaning of the text to revise\n2. maintain valid LaTeX syntax\n3. be grammatically correct\n4. have improved clarity and structure\n5. fit well with the rest of the excerpt\n",
+              "system-message": [
+                "You are an assistant skilled in revising academic writing in LaTeX format.",
+                "You will be provided an excerpt of a LaTeX document.",
+                "You are to revise the text between START-REVISING and STOP-REVISING.",
+                "Your revised text should:",
+                "",
+                "1. retain the original meaning of the text to revise",
+                "2. maintain valid LaTeX syntax",
+                "3. be grammatically correct",
+                "4. have improved clarity and structure",
+                "5. fit well with the rest of the excerpt",
+                "",
+                "For example, given the latex excerpt:",
+                "",
+                "```latex",
+                "\\title{Title of the Document} % optional summary of the document",
+                "\\chapter{Parent Chapter} % optional summary of the containing chapter",
+                "\\section{Parent Section} % optional summary of the containing section",
+                "...",
+                "Knock knock?",
+                "START-REVISING",
+                "whose tehre",
+                "STOP-REVISING",
+                "Me!",
+                "...",
+                "```",
+                "",
+                "You should respond something like:",
+                "",
+                "```latex",
+                "Who's there?",
+                "```",
+                "",
+                "Do not include the backtick delimiters in your response.",
+                ""
+              ],
               "begin-selection-marker": "START-REVISING",
               "end-selection-marker": "STOP-REVISING",
               "section-hierarchy": [
@@ -94,7 +137,42 @@
               "api-key-env-var": "OPENAI_API_KEY",
               "model": "gpt-4o-mini",
               "temperature": 0.6,
-              "system-message": "You are an assistant skilled in writing academic text in LaTeX format. You will be provided an excerpt of a LaTeX document containing a paragraph summary surrounded by START-ELABORATING and STOP-ELABORATING. For example:\n\n```latex\n\\title{Title of the Document} % optional summary of the document\n\\chapter{Parent Chapter} % optional summary of the containing chapter\n\\section{Parent Section} % optional summary of the containing section\n...\nText directly before\nSTART-ELABORATING\nSummary of the paragraph to write\nSTOP-ELABORATING\nText directly after\n...\n```\n\nYou are to write a paragraph based on the text surrounded by START-ELABORATING and STOP-ELABORATING without producing any additional content. Your paragraph should:\n\n1. elaborate on the provided summary\n2. maintain valid LaTeX syntax\n3. be grammatically correct\n4. be clear and concise\n5. fit well with the rest of the excerpt\n",
+              "system-message": [
+                "You are an assistant skilled in writing academic text in LaTeX format.",
+                "You will be provided an excerpt of a LaTeX document.",
+                "You are to write a paragraph based on the indications between START-ELABORATING and STOP-ELABORATING.",
+                "Your paragraph should:",
+                "",
+                "1. elaborate on the provided indications",
+                "2. maintain valid LaTeX syntax",
+                "3. be grammatically correct",
+                "4. be clear and concise",
+                "5. fit well with the rest of the excerpt",
+                "",
+                "For example, given the latex excerpt:",
+                "",
+                "```latex",
+                "\\title{Title of the Document} % optional summary of the document",
+                "\\chapter{Parent Chapter} % optional summary of the containing chapter",
+                "\\section{Parent Section} % optional summary of the containing section",
+                "...",
+                "foo",
+                "START-ELABORATING",
+                "explain bar",
+                "STOP-ELABORATING",
+                "qux",
+                "...",
+                "```",
+                "",
+                "You should respond something like:",
+                "",
+                "```latex",
+                "Bar is a term that refers to a placeholder variable in computer programming.",
+                "```",
+                "",
+                "Do not include the backtick delimiters in your response.",
+                ""
+              ],
               "begin-selection-marker": "START-ELABORATING",
               "end-selection-marker": "STOP-ELABORATING",
               "section-hierarchy": [
@@ -117,8 +195,8 @@
     "check-type": "npx tsc",
     "check-format": "npx prettier --check .",
     "check": "npm run check-type && npm run check-format",
-    "pack": "node bundle.mjs && node package-compile.mjs prod && npx vsce package",
-    "publish": "node bundle.mjs && node package-compile.mjs prod && npx vsce publish"
+    "pack": "node package-compile.mjs prod && node bundle.mjs && npx vsce package",
+    "publish": "node package-compile.mjs prod && node bundle.mjs && npx vsce publish"
   },
   "files": [
     "out/index.js",
@@ -133,5 +211,9 @@
     "esbuild": "^0.23.1",
     "prettier": "^3.3.3",
     "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "html-to-latex-listing": "^0.3.2",
+    "minimatch": "^10.0.1"
   }
 }
