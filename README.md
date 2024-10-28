@@ -1,2 +1,3 @@
-# openai-latex-assistant
-LaTeX assistant writer in vscode
+# vscode-latex-assistant
+
+Assistant writer for LaTeX in Visual Studio Code.

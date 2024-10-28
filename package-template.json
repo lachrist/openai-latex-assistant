@@ -1,0 +1,95 @@
+{
+  "name": "latex-assistant",
+  "icon": "seagull.png",
+  "displayName": "LaTeX Assistant",
+  "description": "LaTeX assistant writer powered by AI.",
+  "version": "0.0.0",
+  "publisher": "lachrist",
+  "repository": "https://github.com/lachrist/vscode-latex-assistant",
+  "engines": {
+    "vscode": "^1.93.1"
+  },
+  "activationEvents": ["onStartupFinished"],
+  "main": "./<LIB-DIR>/index.js",
+  "contributes": {
+    "commands": [],
+    "configuration": {
+      "type": "object",
+      "title": "Listing Extension Settings",
+      "properties": {
+        "latex-assistant.openai": {
+          "description": "List of prompts powered by OpenAI.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The name of the prompt.",
+                "type": "string"
+              },
+              "api-key-env-var": {
+                "description": "Environment variable holding the OpenAI API key to use.",
+                "type": "string"
+              },
+              "model": {
+                "description": "The OpenAI model to prompt.",
+                "type": "string"
+              },
+              "temperature": {
+                "description": "Temperature, a float between 0 and 2 which dictates the response creativity. Stick to low temperature for academic writing.",
+                "type": "number"
+              },
+              "system-message": {
+                "description": "The system message that defines the behavior of the prompt.",
+                "type": "string"
+              },
+              "begin-seletion-marker": {
+                "description": "The marker that defines the beginning of the selection.",
+                "type": "string"
+              },
+              "end-selection-marker": {
+                "description": "The marker that defines the end of the selection.",
+                "type": "string"
+              },
+              "section-hierarchy": {
+                "description": "A list of LaTeX commands that defines the section hierarchy of the document.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "before-char-count": {
+                "description": "The number of characters to include before the selection.",
+                "type": "number"
+              },
+              "after-char-count": {
+                "description": "The number of characters to include after the selection.",
+                "type": "number"
+              }
+            }
+          },
+          "default": "<DEFAULT-PROMPT-LIST>"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "check-type": "npx tsc",
+    "check-format": "npx prettier --check .",
+    "check": "npm run check-type && npm run check-format",
+    "pack": "node bundle.mjs && node flip.mjs prod && npx vsce package && node flip.mjs test",
+    "publish": "node bundle.mjs && node flip.mjs prod && npx vsce publish && node flip.mjs test"
+  },
+  "files": ["out/index.js", "package.json", "seagull.png", "LICENSE"],
+  "devDependencies": {
+    "@types/node": "^22.5.5",
+    "@types/vscode": "^1.73.0",
+    "@vscode/vsce": "^3.1.0",
+    "esbuild": "^0.23.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "html-to-latex-listing": "^0.3.2",
+    "minimatch": "^10.0.1"
+  }
+}

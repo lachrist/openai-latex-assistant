@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "declaration": false,
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "lib": ["es2022"],
+    "target": "es2022",
+    "module": "es2022",
+    "typeRoots": ["./node_modules/@types"],
+    "exactOptionalPropertyTypes": true
+  },
+  "include": ["src", "package-compile.mjs"]
+}
