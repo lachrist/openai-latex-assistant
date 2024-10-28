@@ -59,7 +59,6 @@ var fetchOpenai = async (message, config) => {
   if (bearer === null) {
     throw new Error(`OpenAI API key is not in ${env_var}`);
   }
-  console.dir({ bearer, message, config });
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
